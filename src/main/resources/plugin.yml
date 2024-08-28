@@ -1,4 +1,0 @@
-name: PigeonLib
-version: '1.0-SNAPSHOT'
-main: org.irmc.pigeonLib.PigeonLib
-api-version: '1.20'

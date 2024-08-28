@@ -44,7 +44,7 @@ public final class LanguageManager {
 
         File pluginFolder = plugin.getDataFolder();
 
-        URL fileURL = Objects.requireNonNull(plugin.getClass().getClassLoader().getResource("language/"));
+        URL fileURL = Objects.requireNonNull(plugin.getClass().getResource("language/"));
         String jarPath = fileURL.toString().substring(0, fileURL.toString().indexOf("!/") + 2);
 
         try {

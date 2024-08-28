@@ -420,7 +420,7 @@ public final class ItemUtils {
      * This method adds a line of lore to the specified item.
      * @param item the item
      * @param lore the line of lore to add
-     * @param appendEmptyLine whether to append an empty line before the line of lore
+     * @param appendEmptyLine whether to append an empty line before the line of lore (won't append if the item has no lore)
      */
     public static void addLore(ItemStack item, Component lore, boolean appendEmptyLine) {
         ItemMeta meta = item.getItemMeta();
@@ -465,6 +465,10 @@ public final class ItemUtils {
         }
 
         return Component.translatable(getTranslationKey(item.getType()));
+    }
+
+    public static boolean isActualBlock(Material material) {
+        return material.isBlock() && !material.isAir();
     }
 
     private static String getTranslationKey(Material material) {
