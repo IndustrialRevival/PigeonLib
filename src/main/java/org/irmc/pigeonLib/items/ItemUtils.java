@@ -2,6 +2,7 @@ package org.irmc.pigeonLib.items;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,9 +13,46 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.Contract;
 
 public final class ItemUtils {
     private ItemUtils() {}
+
+    @Contract("null,_ -> null")
+    public static ItemStack getCleanedItem(@Nullable ItemStack item, @Nullable Consumer<ItemMeta> additionalSettings) {
+        if (item == null) {
+            return null;
+        }
+
+        ItemStack baseItem = new ItemStack(item.getType(), item.getAmount());
+        ItemMeta meta = baseItem.getItemMeta();
+
+        ItemMeta originalMeta = item.getItemMeta();
+
+        if (originalMeta.hasCustomModelData()) {
+            meta.setCustomModelData(originalMeta.getCustomModelData());
+        }
+
+        if (originalMeta.hasDisplayName()) {
+            meta.displayName(originalMeta.displayName());
+        }
+        if (originalMeta.hasLore()) {
+            meta.lore(originalMeta.lore());
+        }
+
+        originalMeta.getItemFlags().forEach(meta::addItemFlags);
+
+        meta.setUnbreakable(originalMeta.isUnbreakable());
+        item.getEnchantments().forEach(baseItem::addEnchantment);
+
+        if (additionalSettings != null) {
+            additionalSettings.accept(meta);
+        }
+
+        baseItem.setItemMeta(meta);
+
+        return item;
+    }
 
     /**
      * This method compares two instances of {@link ItemStack} and checks
