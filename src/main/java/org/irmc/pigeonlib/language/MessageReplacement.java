@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.language;
+package org.irmc.pigeonlib.language;
 
 import it.unimi.dsi.fastutil.Pair;
 import lombok.Getter;

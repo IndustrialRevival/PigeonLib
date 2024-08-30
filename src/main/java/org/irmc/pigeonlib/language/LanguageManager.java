@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.language;
+package org.irmc.pigeonlib.language;
 
 import java.io.File;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.irmc.pigeonLib.file.ConfigFileUtil;
+import org.irmc.pigeonlib.file.ConfigFileUtil;
 import org.jetbrains.annotations.Nullable;
 
 /**

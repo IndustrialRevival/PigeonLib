@@ -1,10 +1,10 @@
-package org.irmc.pigeonLib.pdc;
+package org.irmc.pigeonlib.pdc;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
-import org.irmc.pigeonLib.pdc.types.PersistentDataTypes;
+import org.irmc.pigeonlib.pdc.types.PersistentDataTypes;
 import org.jetbrains.annotations.Nullable;
 
 /**

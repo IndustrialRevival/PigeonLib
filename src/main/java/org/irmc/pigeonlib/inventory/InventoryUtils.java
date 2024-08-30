@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.inventory;
+package org.irmc.pigeonlib.inventory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.irmc.pigeonLib.items.ItemUtils;
+import org.irmc.pigeonlib.items.ItemUtils;
 
 public final class InventoryUtils {
 

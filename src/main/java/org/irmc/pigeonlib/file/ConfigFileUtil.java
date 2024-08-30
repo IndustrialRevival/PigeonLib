@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.file;
+package org.irmc.pigeonlib.file;
 
 import java.io.File;
 import java.io.InputStream;

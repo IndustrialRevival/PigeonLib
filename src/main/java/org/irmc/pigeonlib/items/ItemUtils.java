@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.items;
+package org.irmc.pigeonlib.items;
 
 import java.util.List;
 import java.util.Objects;

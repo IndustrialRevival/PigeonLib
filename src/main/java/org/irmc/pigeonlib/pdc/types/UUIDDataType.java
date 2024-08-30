@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.pdc.types;
+package org.irmc.pigeonlib.pdc.types;
 
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;

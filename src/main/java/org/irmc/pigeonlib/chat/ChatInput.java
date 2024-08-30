@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.chat;
+package org.irmc.pigeonlib.chat;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

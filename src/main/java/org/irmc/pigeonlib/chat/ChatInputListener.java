@@ -1,4 +1,4 @@
-package org.irmc.pigeonLib.chat;
+package org.irmc.pigeonlib.chat;
 
 import java.util.HashMap;
 import java.util.HashSet;
