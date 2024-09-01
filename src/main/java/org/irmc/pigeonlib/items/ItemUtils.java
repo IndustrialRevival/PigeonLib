@@ -7,17 +7,20 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.irmc.pigeonlib.mcversion.MCVersion;
+import org.irmc.pigeonlib.mcversion.VersionGetter;
 import org.jetbrains.annotations.Contract;
 
+@UtilityClass
 public final class ItemUtils {
-    private ItemUtils() {}
-
+    MCVersion MC_VERSION = VersionGetter.getVersion();
     @Contract("null,_ -> null")
     public static ItemStack getCleanedItem(@Nullable ItemStack item, @Nullable Consumer<ItemMeta> additionalSettings) {
         if (item == null) {
@@ -65,7 +68,7 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(@Nullable ItemStack a, @Nullable ItemStack b) {
-        return isItemSimilar(a, b, true, true);
+        return isItemSimilar(a, b, false, true, false);
     }
 
     /**
@@ -76,7 +79,19 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore) {
-        return isItemSimilar(item1, item2, checkLore, true);
+        return isItemSimilar(item1, item2, checkLore, true, false);
+    }
+
+    /**
+     * This method compares two instances of {@link ItemStack} and checks
+     * @param item1 item one
+     * @param item2 item two
+     * @param checkLore Whether to check lore
+    * @param checkAmount Whether to check amount
+     * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
+     */
+    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount) {
+        return isItemSimilar(item1, item2, checkLore, checkAmount, false);
     }
 
     /**
@@ -85,79 +100,167 @@ public final class ItemUtils {
      * @param item2 item two
      * @param checkLore Whether to check lore
      * @param checkAmount Whether to check amount
+     * @param checkSameID Whether to check SameIDItem
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
-    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount) {
+    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID) {
+        // Null check
         if (item1 == null || item2 == null) {
-            return item1 == item2;
+            return item1 == null && item2 == null;
         }
 
+        // If types do not match, then the items cannot possibly match
         if (item1.getType() != item2.getType()) {
             return false;
         }
 
-        if (checkAmount && item1.getAmount() < item2.getAmount()) {
+        // If amounts do not match, then the items cannot possibly match
+        if (checkAmount && item1.getAmount() > item2.getAmount()) {
             return false;
         }
 
-        if (item1.hasItemMeta() != item2.hasItemMeta()) {
+        // If either item does not have a meta then either a mismatch or both without meta = vanilla
+        if (!item1.hasItemMeta() || !item2.hasItemMeta()) {
+            return item1.hasItemMeta() == item2.hasItemMeta();
+        }
+
+        // Now we need to compare meta's directly - cache is already out, but let's fetch the 2nd meta also
+        final ItemMeta itemMeta = item1.getItemMeta();
+        final ItemMeta cachedMeta = item2.getItemMeta();
+
+        if (itemMeta == null || cachedMeta == null) {
+            return itemMeta == cachedMeta;
+        }
+
+        // ItemMetas are different types and cannot match
+        if (!itemMeta.getClass().equals(cachedMeta.getClass())) {
             return false;
         }
 
-        ItemMeta meta1 = item1.getItemMeta();
-        ItemMeta meta2 = item2.getItemMeta();
+        // SameIDItem need make isSimilarItem by themselves
+        if (checkSameID && item1 instanceof SameIDItem sii && item2 instanceof SameIDItem) {
+            return sii.isSimilarItem(item1, item2);
+        }
 
-        if (meta1.hasDisplayName()
-                && meta2.hasDisplayName()
-                && !Objects.equals(meta1.displayName(), meta2.displayName())) {
+        // Quick meta-extension escapes
+        if (metaNotEquals(itemMeta, cachedMeta)) {
             return false;
         }
 
-        if (meta1.hasCustomModelData() != meta2.hasCustomModelData()) {
+        // Has a display name (checking the name occurs later)
+        if (itemMeta.hasDisplayName() != cachedMeta.hasDisplayName()) {
             return false;
-        } else {
-            if (meta1.getCustomModelData() != meta2.getCustomModelData()) {
+        }
+
+        // Custom model data is different, no match
+        final boolean hasCustomOne = itemMeta.hasCustomModelData();
+        final boolean hasCustomTwo = cachedMeta.hasCustomModelData();
+        if (hasCustomOne) {
+            if (!hasCustomTwo || itemMeta.getCustomModelData() != cachedMeta.getCustomModelData()) {
                 return false;
             }
-        }
-
-        if (!item1.getEnchantments().equals(item2.getEnchantments())) {
+        } else if (hasCustomTwo) {
             return false;
         }
 
-        if (metaNotEquals(meta1, meta2)) {
+        // PDCs don't match
+        if (!itemMeta.getPersistentDataContainer().equals(cachedMeta.getPersistentDataContainer())) {
             return false;
         }
 
-        PersistentDataContainer pdc1 = meta1.getPersistentDataContainer();
-        PersistentDataContainer pdc2 = meta2.getPersistentDataContainer();
-
-        if (pdc1.getKeys().size() != pdc2.getKeys().size()) {
+        // Make sure enchantments match
+        if (!itemMeta.getEnchants().equals(cachedMeta.getEnchants())) {
             return false;
         }
 
-        if (!pdc1.equals(pdc2)) {
+        // Check item flags
+        if (!itemMeta.getItemFlags().equals(cachedMeta.getItemFlags())) {
             return false;
         }
 
+        // Check the display name
+        if (itemMeta.hasDisplayName() && !Objects.equals(itemMeta.getDisplayName(), cachedMeta.getDisplayName())) {
+            return false;
+        }
+
+        // Check the lore
         if (checkLore) {
-            List<Component> lore1 = meta1.lore();
-            List<Component> lore2 = meta2.lore();
-
-            if (lore1 == null || lore2 == null) {
-                return lore1 == lore2;
-            }
-
-            if (lore1.size() != lore2.size()) {
-                return false;
-            }
-
-            for (int i = 0; i < lore1.size(); i++) {
-                if (!Objects.equals(lore1.get(i), lore2.get(i))) {
+            if (itemMeta.hasLore() && cachedMeta.hasLore()) {
+                if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
                     return false;
                 }
+            } else if (itemMeta.hasLore() != cachedMeta.hasLore()) {
+                return false;
             }
         }
+
+        // Check the attribute modifiers
+        final boolean hasAttributeOne = itemMeta.hasAttributeModifiers();
+        final boolean hasAttributeTwo = cachedMeta.hasAttributeModifiers();
+        if (hasAttributeOne) {
+            if (!hasAttributeTwo ||!Objects.equals(itemMeta.getAttributeModifiers(), cachedMeta.getAttributeModifiers())) {
+                return false;
+            }
+        } else if (hasAttributeTwo) {
+            return false;
+        }
+
+        // Check if unbreakable
+        if (itemMeta.isUnbreakable() != cachedMeta.isUnbreakable()) {
+            return false;
+        }
+
+        /*
+        if (MC_VERSION.atLeast(MCVersion.MC1_20_5)) {
+            // Check if fire-resistant
+            if (itemMeta.isFireResistant() != cachedMeta.isFireResistant()) {
+                return false;
+            }
+
+            // Check if hide tooltip
+            if (itemMeta.isHideTooltip() != cachedMeta.isHideTooltip()) {
+                return false;
+            }
+
+            // Check rarity
+            final boolean hasRarityOne = itemMeta.hasRarity();
+            final boolean hasRarityTwo = cachedMeta.hasRarity();
+            if (hasRarityOne) {
+                if (!hasRarityTwo || itemMeta.getRarity() != cachedMeta.getRarity()) {
+                    return false;
+                }
+            } else if (hasRarityTwo) {
+                return false;
+            }
+
+            // Check food components
+            if (itemMeta.hasFood() && cachedMeta.hasFood()) {
+                if (!Objects.equals(itemMeta.getFood(), cachedMeta.getFood())) {
+                    return false;
+                }
+            } else if (itemMeta.hasFood() != cachedMeta.hasFood()) {
+                return false;
+            }
+
+            // Check tool components
+            if (itemMeta.hasTool() && cachedMeta.hasTool()) {
+                if (!Objects.equals(itemMeta.getTool(), cachedMeta.getTool())) {
+                    return false;
+                }
+            } else if (itemMeta.hasTool() != cachedMeta.hasTool()) {
+                return false;
+            }
+
+            // Check jukebox playable
+            if (itemMeta.hasJukeboxPlayable() && cachedMeta.hasJukeboxPlayable()) {
+                if (!Objects.equals(itemMeta.getJukeboxPlayable(), cachedMeta.getJukeboxPlayable())) {
+                    return false;
+                }
+            } else if (itemMeta.hasJukeboxPlayable() != cachedMeta.hasJukeboxPlayable()) {
+                return false;
+            }
+        }
+         */
 
         return true;
     }
@@ -168,8 +271,23 @@ public final class ItemUtils {
             return meta1 != meta2;
         }
 
+        // Damageable (first as everything can be damageable apparently)
         if (meta1 instanceof Damageable instanceOne && meta2 instanceof Damageable instanceTwo) {
+            if (instanceOne.hasDamage() != instanceTwo.hasDamage()) {
+                return true;
+            }
+
             if (instanceOne.getDamage() != instanceTwo.getDamage()) {
+                return true;
+            }
+        }
+
+        if (meta1 instanceof Repairable instanceOne && meta2 instanceof Repairable instanceTwo) {
+            if (instanceOne.hasRepairCost() != instanceTwo.hasRepairCost()) {
+                return true;
+            }
+
+            if (instanceOne.getRepairCost() != instanceTwo.getRepairCost()) {
                 return true;
             }
         }
@@ -180,7 +298,9 @@ public final class ItemUtils {
                 return true;
             }
 
-            if (!instanceOne.hasVariant() || !instanceTwo.hasVariant()) return true;
+            if (!instanceOne.hasVariant() || !instanceTwo.hasVariant()) {
+                return true;
+            }
 
             if (instanceOne.getVariant() != instanceTwo.getVariant()) {
                 return true;
@@ -189,7 +309,29 @@ public final class ItemUtils {
 
         // Banner
         if (meta1 instanceof BannerMeta instanceOne && meta2 instanceof BannerMeta instanceTwo) {
+            if (instanceOne.numberOfPatterns() != instanceTwo.numberOfPatterns()) {
+                return true;
+            }
+
             if (!instanceOne.getPatterns().equals(instanceTwo.getPatterns())) {
+                return true;
+            }
+        }
+
+        // BlockData
+        if (meta1 instanceof BlockDataMeta instanceOne && meta2 instanceof BlockDataMeta instanceTwo) {
+            if (instanceOne.hasBlockData() != instanceTwo.hasBlockData()) {
+                return true;
+            }
+        }
+
+        // BlockState
+        if (meta1 instanceof BlockStateMeta instanceOne && meta2 instanceof BlockStateMeta instanceTwo) {
+            if (instanceOne.hasBlockState() != instanceTwo.hasBlockState()) {
+                return true;
+            }
+
+            if (!instanceOne.getBlockState().equals(instanceTwo.getBlockState())) {
                 return true;
             }
         }
@@ -206,6 +348,16 @@ public final class ItemUtils {
                 return true;
             }
             if (!Objects.equals(instanceOne.getGeneration(), instanceTwo.getGeneration())) {
+                return true;
+            }
+        }
+
+        // Bundle
+        if (meta1 instanceof BundleMeta instanceOne && meta2 instanceof BundleMeta instanceTwo) {
+            if (instanceOne.hasItems() != instanceTwo.hasItems()) {
+                return true;
+            }
+            if (!instanceOne.getItems().equals(instanceTwo.getItems())) {
                 return true;
             }
         }
@@ -231,8 +383,7 @@ public final class ItemUtils {
         }
 
         // Enchantment Storage
-        if (meta1 instanceof EnchantmentStorageMeta instanceOne
-                && meta2 instanceof EnchantmentStorageMeta instanceTwo) {
+        if (meta1 instanceof EnchantmentStorageMeta instanceOne && meta2 instanceof EnchantmentStorageMeta instanceTwo) {
             if (instanceOne.hasStoredEnchants() != instanceTwo.hasStoredEnchants()) {
                 return true;
             }
@@ -289,8 +440,10 @@ public final class ItemUtils {
 
         // Potion
         if (meta1 instanceof PotionMeta instanceOne && meta2 instanceof PotionMeta instanceTwo) {
-            if (!instanceOne.getBasePotionData().equals(instanceTwo.getBasePotionData())) {
-                return true;
+            if (!MC_VERSION.atLeast(MCVersion.MC1_20_5)) {
+                if (!Objects.equals(instanceOne.getBasePotionData(), instanceTwo.getBasePotionData())) {
+                    return true;
+                }
             }
             if (instanceOne.hasCustomEffects() != instanceTwo.hasCustomEffects()) {
                 return true;
@@ -318,14 +471,17 @@ public final class ItemUtils {
 
         // Stew
         if (meta1 instanceof SuspiciousStewMeta instanceOne && meta2 instanceof SuspiciousStewMeta instanceTwo) {
+            if (instanceOne.hasCustomEffects() != instanceTwo.hasCustomEffects()) {
+                return true;
+            }
+
             if (!Objects.equals(instanceOne.getCustomEffects(), instanceTwo.getCustomEffects())) {
                 return true;
             }
         }
 
         // Fish Bucket
-        if (meta1 instanceof TropicalFishBucketMeta instanceOne
-                && meta2 instanceof TropicalFishBucketMeta instanceTwo) {
+        if (meta1 instanceof TropicalFishBucketMeta instanceOne && meta2 instanceof TropicalFishBucketMeta instanceTwo) {
             if (instanceOne.hasVariant() != instanceTwo.hasVariant()) {
                 return true;
             }
@@ -335,17 +491,87 @@ public final class ItemUtils {
             if (!instanceOne.getBodyColor().equals(instanceTwo.getBodyColor())) {
                 return true;
             }
-            return !instanceOne.getPatternColor().equals(instanceTwo.getPatternColor());
-        }
-
-        // Bundle
-        if (meta1 instanceof BundleMeta instanceOne && meta2 instanceof BundleMeta instanceTwo) {
-            if (instanceOne.hasItems() != instanceTwo.hasItems()) {
+            if (!instanceOne.getPatternColor().equals(instanceTwo.getPatternColor())) {
                 return true;
             }
-            return !instanceOne.getItems().equals(instanceTwo.getItems());
         }
 
+        // Knowledge Book
+        if (meta1 instanceof KnowledgeBookMeta instanceOne && meta2 instanceof KnowledgeBookMeta instanceTwo) {
+            if (instanceOne.hasRecipes() != instanceTwo.hasRecipes()) {
+                return true;
+            }
+
+            if (!Objects.equals(instanceOne.getRecipes(), instanceTwo.getRecipes())) {
+                return true;
+            }
+        }
+
+        // Music Instrument
+        if (meta1 instanceof MusicInstrumentMeta instanceOne && meta2 instanceof MusicInstrumentMeta instanceTwo) {
+            if (!Objects.equals(instanceOne.getInstrument(), instanceTwo.getInstrument())) {
+                return true;
+            }
+        }
+
+        // Spawn Egg
+        if (meta1 instanceof SpawnEggMeta instanceOne && meta2 instanceof SpawnEggMeta instanceTwo) {
+            if (!instanceOne.getSpawnedType().equals(instanceTwo.getSpawnedType())) {
+                return true;
+            }
+            /*
+            if (MC_VERSION.atLeast(MCVersion.MC1_21)) {
+                if (!Objects.equals(instanceOne.getSpawnedEntity(), instanceTwo.getSpawnedEntity())) {
+                    return true;
+                }
+            } else {
+                if (!instanceOne.getSpawnedType().equals(instanceTwo.getSpawnedType())) {
+                    return true;
+                }
+            }
+             */
+        }
+
+        // Armor
+        if (meta1 instanceof ArmorMeta instanceOne && meta2 instanceof ArmorMeta instanceTwo) {
+            if (!Objects.equals(instanceOne.getTrim(), instanceTwo.getTrim())) {
+                return true;
+            }
+        }
+
+        /*
+        if (MC_VERSION.atLeast(MCVersion.MC1_20_5)) {
+            // Writable Book
+            if (meta1 instanceof WritableBookMeta instanceOne && meta2 instanceof WritableBookMeta instanceTwo) {
+                if (instanceOne.getPageCount() != instanceTwo.getPageCount()) {
+                    return true;
+                }
+                if (!Objects.equals(instanceOne.getPages(), instanceTwo.getPages())) {
+                    return true;
+                }
+            }
+            if (MC_VERSION.atLeast(MCVersion.MC1_21)) {
+                // Ominous Bottle
+                if (meta1 instanceof OminousBottleMeta instanceOne && meta2 instanceof OminousBottleMeta instanceTwo) {
+                    if (instanceOne.hasAmplifier() != instanceTwo.hasAmplifier()) {
+                        return true;
+                    }
+
+                    if (instanceOne.getAmplifier() != instanceTwo.getAmplifier()) {
+                        return true;
+                    }
+                }
+                // Shield
+                if (meta1 instanceof ShieldMeta instanceOne && meta2 instanceof ShieldMeta instanceTwo) {
+                    if (Objects.equals(instanceOne.getBaseColor(), instanceTwo.getBaseColor())) {
+                        return true;
+                    }
+                }
+            }
+        }
+         */
+
+        // Cannot escape via any meta extension check
         return false;
     }
 
@@ -420,23 +646,21 @@ public final class ItemUtils {
      *            Whether Items should be replaced with their "empty" version
      */
     public static void consumeItem(@Nonnull ItemStack item, int amount, boolean replaceConsumables) {
-        if (item.getType() != Material.AIR && item.getAmount() > 0) {
+        if (!item.getType().isAir() && item.getAmount() > 0) {
             if (replaceConsumables) {
                 switch (item.getType()) {
-                    case POTION:
-                    case DRAGON_BREATH:
-                    case HONEY_BOTTLE:
+                    case POTION, DRAGON_BREATH, HONEY_BOTTLE -> {
                         item.setType(Material.GLASS_BOTTLE);
                         item.setAmount(1);
                         return;
-                    case WATER_BUCKET:
-                    case LAVA_BUCKET:
-                    case MILK_BUCKET:
+                    }
+                    case WATER_BUCKET, LAVA_BUCKET, MILK_BUCKET -> {
                         item.setType(Material.BUCKET);
                         item.setAmount(1);
                         return;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             }
 
@@ -464,12 +688,30 @@ public final class ItemUtils {
         ItemMeta meta = item.getItemMeta();
         if (meta.hasLore()) {
             List<Component> loreList = meta.lore();
+            if (loreList == null) {
+                return;
+            }
 
             if (appendEmptyLine) {
                 loreList.add(Component.empty());
             }
 
             loreList.add(lore);
+            meta.lore(loreList);
+        } else {
+            meta.lore(List.of(lore));
+        }
+    }
+
+    public static void insertLore(ItemStack item, int index, Component lore) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta.hasLore()) {
+            List<Component> loreList = meta.lore();
+            if (loreList == null) {
+                loreList = List.of(lore);
+            } else {
+                loreList.add(index, lore);
+            }
             meta.lore(loreList);
         } else {
             meta.lore(List.of(lore));
