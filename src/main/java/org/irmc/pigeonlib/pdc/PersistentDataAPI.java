@@ -141,7 +141,7 @@ public class PersistentDataAPI {
         return holder.getPersistentDataContainer().has(key, type);
     }
 
-    public static <T, Z> void remove(PersistentDataHolder holder, NamespacedKey key) {
+    public static void remove(PersistentDataHolder holder, NamespacedKey key) {
         holder.getPersistentDataContainer().remove(key);
     }
 }
