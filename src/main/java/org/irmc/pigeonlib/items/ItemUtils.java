@@ -14,6 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.irmc.pigeonlib.dict.DictionaryUtil;
 import org.irmc.pigeonlib.mcversion.MCVersion;
 import org.irmc.pigeonlib.mcversion.VersionGetter;
 import org.jetbrains.annotations.Contract;
@@ -46,6 +47,7 @@ public final class ItemUtils {
         originalMeta.getItemFlags().forEach(meta::addItemFlags);
 
         meta.setUnbreakable(originalMeta.isUnbreakable());
+        meta.setAttributeModifiers(meta.getAttributeModifiers());
         item.getEnchantments().forEach(baseItem::addEnchantment);
 
         if (additionalSettings != null) {
@@ -68,7 +70,7 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(@Nullable ItemStack a, @Nullable ItemStack b) {
-        return isItemSimilar(a, b, false, true, false);
+        return isItemSimilar(a, b, false, false, false, true);
     }
 
     /**
@@ -79,7 +81,7 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore) {
-        return isItemSimilar(item1, item2, checkLore, true, false);
+        return isItemSimilar(item1, item2, checkLore, false, false, true);
     }
 
     /**
@@ -91,7 +93,11 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount) {
-        return isItemSimilar(item1, item2, checkLore, checkAmount, false);
+        return isItemSimilar(item1, item2, checkLore, checkAmount, false, true);
+    }
+
+    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID) {
+        return isItemSimilar(item1, item2, checkLore, checkAmount, checkSameID, true);
     }
 
     /**
@@ -101,9 +107,10 @@ public final class ItemUtils {
      * @param checkLore Whether to check lore
      * @param checkAmount Whether to check amount
      * @param checkSameID Whether to check SameIDItem
+     * @param checkDictonary Whether to check DictionaryItem
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
-    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID) {
+    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID, boolean checkDictonary) {
         // Null check
         if (item1 == null || item2 == null) {
             return item1 == null && item2 == null;
@@ -137,11 +144,6 @@ public final class ItemUtils {
             return false;
         }
 
-        // SameIDItem need make isSimilarItem by themselves
-        if (checkSameID && item1 instanceof SameIDItem sii && item2 instanceof SameIDItem) {
-            return sii.isSimilarItem(item1, item2);
-        }
-
         // Quick meta-extension escapes
         if (metaNotEquals(itemMeta, cachedMeta)) {
             return false;
@@ -166,6 +168,28 @@ public final class ItemUtils {
         // PDCs don't match
         if (!itemMeta.getPersistentDataContainer().equals(cachedMeta.getPersistentDataContainer())) {
             return false;
+        }
+
+        // DictionaryItem
+        if (checkDictonary) {
+            DictionaryItem dictItem1 = DictionaryItem.fromItemStack(item1);
+            DictionaryItem dictItem2 = DictionaryItem.fromItemStack(item2);
+            if (dictItem1 != dictItem2) {
+                return false;
+            }
+            if (dictItem1 != null) {
+                if (!Objects.equals(dictItem1.getKeyName(), dictItem2.getKeyName())) {
+                    return false;
+                }
+                if (!Objects.equals(dictItem1.getDictionary().getKey(), dictItem2.getDictionary().getKey())) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        // Same ID Item need make isSimilarItem by themselves
+        if (checkSameID && item1 instanceof SameIDItem sii && item2 instanceof SameIDItem) {
+            return sii.isSimilarItem(item1, item2);
         }
 
         // Make sure enchantments match
