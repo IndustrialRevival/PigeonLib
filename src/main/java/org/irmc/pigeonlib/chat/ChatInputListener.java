@@ -60,7 +60,7 @@ final class ChatInputListener implements Listener {
     }
 
     @EventHandler
-    public void onComamnd(PlayerCommandPreprocessEvent e) {
+    public void onCommand(PlayerCommandPreprocessEvent e) {
         checkInput(e, e.getPlayer(), e.getMessage());
     }
 
