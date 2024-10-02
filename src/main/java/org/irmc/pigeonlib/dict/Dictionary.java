@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.irmc.pigeonlib.items.ItemUtils;
 import org.irmc.pigeonlib.pdc.PersistentDataAPI;
 
 import javax.annotation.Nonnull;
@@ -36,6 +37,9 @@ public class Dictionary {
     @Getter
     @Setter
     private boolean locked;
+    @Getter
+    @Setter
+    private ItemStack defaultItem;
     public Dictionary(JavaPlugin plugin) {
         this.key = new NamespacedKey(plugin, PDC_KEY);
         this.name = key.getKey();
@@ -73,6 +77,10 @@ public class Dictionary {
             return;
         }
         PersistentDataAPI.set(meta, getKey(), PersistentDataType.STRING, keyName);
+        itemStack.setItemMeta(meta);
+        if (defaultItem == null) {
+            defaultItem = ItemUtils.cloneItem(itemStack, 1);
+        }
     }
 
     public void setDictMeta(@Nonnull ItemStack itemStack, String keyName) {
@@ -101,6 +109,7 @@ public class Dictionary {
             return;
         }
         PersistentDataAPI.remove(meta, getKey());
+        itemStack.setItemMeta(meta);
     }
 
     public void registerKey(String key) {
