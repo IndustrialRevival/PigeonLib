@@ -37,9 +37,6 @@ public class Dictionary {
     @Getter
     @Setter
     private boolean locked;
-    @Getter
-    @Setter
-    private ItemStack defaultItem;
     public Dictionary(JavaPlugin plugin) {
         this.key = new NamespacedKey(plugin, PDC_KEY);
         this.name = key.getKey();
@@ -78,9 +75,6 @@ public class Dictionary {
         }
         PersistentDataAPI.set(meta, getKey(), PersistentDataType.STRING, keyName);
         itemStack.setItemMeta(meta);
-        if (defaultItem == null) {
-            defaultItem = ItemUtils.cloneItem(itemStack, 1);
-        }
     }
 
     public void setDictMeta(@Nonnull ItemStack itemStack, String keyName) {
