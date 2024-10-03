@@ -13,8 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.irmc.pigeonlib.dict.DictionaryUtil;
 import org.irmc.pigeonlib.mcversion.MCVersion;
 import org.irmc.pigeonlib.mcversion.VersionGetter;
 import org.jetbrains.annotations.Contract;
@@ -47,7 +45,7 @@ public final class ItemUtils {
         originalMeta.getItemFlags().forEach(meta::addItemFlags);
 
         meta.setUnbreakable(originalMeta.isUnbreakable());
-        meta.setAttributeModifiers(meta.getAttributeModifiers());
+        meta.setAttributeModifiers(originalMeta.getAttributeModifiers());
         item.getEnchantments().forEach(baseItem::addEnchantment);
 
         if (additionalSettings != null) {
@@ -170,23 +168,6 @@ public final class ItemUtils {
             return false;
         }
 
-        // DictionaryItem
-        if (checkDictonary) {
-            DictionaryItem dictItem1 = DictionaryItem.fromItemStack(item1);
-            DictionaryItem dictItem2 = DictionaryItem.fromItemStack(item2);
-            if (dictItem1 != dictItem2) {
-                return false;
-            }
-            if (dictItem1 != null) {
-                if (!Objects.equals(dictItem1.getKeyName(), dictItem2.getKeyName())) {
-                    return false;
-                }
-                if (!Objects.equals(dictItem1.getDictionary().getKey(), dictItem2.getDictionary().getKey())) {
-                    return false;
-                }
-                return true;
-            }
-        }
         // Same ID Item need make isSimilarItem by themselves
         if (checkSameID && item1 instanceof SameIDItem sii && item2 instanceof SameIDItem) {
             return sii.isSimilarItem(item1, item2);
@@ -540,20 +521,20 @@ public final class ItemUtils {
 
         // Spawn Egg
         if (meta1 instanceof SpawnEggMeta instanceOne && meta2 instanceof SpawnEggMeta instanceTwo) {
+            //for removal
             if (!instanceOne.getSpawnedType().equals(instanceTwo.getSpawnedType())) {
                 return true;
             }
-            /*
-            if (MC_VERSION.atLeast(MCVersion.MC1_21)) {
+
+            if (MC_VERSION.atLeast(MCVersion.MC1_20_4)) {
                 if (!Objects.equals(instanceOne.getSpawnedEntity(), instanceTwo.getSpawnedEntity())) {
                     return true;
                 }
             } else {
-                if (!instanceOne.getSpawnedType().equals(instanceTwo.getSpawnedType())) {
+                if (!instanceOne.getCustomSpawnedType().equals(instanceTwo.getCustomSpawnedType())) {
                     return true;
                 }
             }
-             */
         }
 
         // Armor
