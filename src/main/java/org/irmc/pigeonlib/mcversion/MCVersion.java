@@ -1,19 +1,24 @@
 package org.irmc.pigeonlib.mcversion;
 
+import io.papermc.lib.PaperLib;
 import lombok.Getter;
 
 @Getter
 public enum MCVersion {
-    MC_1_20(20, 0),
-    MC1_20_1(20, 1),
-    MC1_20_2(20, 2),
-    MC1_20_3(20, 3),
     MC1_20_4(20, 4),
     MC1_20_5(20, 5),
     MC1_20_6(20, 6),
     MC1_21(21, 0),
     MC1_21_1(21, 1),
     UNKNOWN(-1, -1);
+
+    public static final MCVersion CURRENT;
+
+    static {
+        int major = PaperLib.getMinecraftVersion();
+        int minor = PaperLib.getMinecraftPatchVersion();
+        CURRENT = MCVersion.getByInt(major, minor);
+    }
 
     private final int major;
     private final int minor;
@@ -39,7 +44,7 @@ public enum MCVersion {
         return values()[index];
     }
 
-    public MCVersion getByInt(int major, int minor) {
+    public static MCVersion getByInt(int major, int minor) {
         for (MCVersion version : values()) {
             if (version.getMajor() == major && version.getMinor() == minor) {
                 return version;

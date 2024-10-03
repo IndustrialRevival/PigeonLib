@@ -14,12 +14,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.irmc.pigeonlib.mcversion.MCVersion;
-import org.irmc.pigeonlib.mcversion.VersionGetter;
 import org.jetbrains.annotations.Contract;
 
 @UtilityClass
 public final class ItemUtils {
-    MCVersion MC_VERSION = VersionGetter.getVersion();
     @Contract("null,_ -> null")
     public static ItemStack getCleanedItem(@Nullable ItemStack item, @Nullable Consumer<ItemMeta> additionalSettings) {
         if (item == null) {
@@ -445,7 +443,7 @@ public final class ItemUtils {
 
         // Potion
         if (meta1 instanceof PotionMeta instanceOne && meta2 instanceof PotionMeta instanceTwo) {
-            if (!MC_VERSION.atLeast(MCVersion.MC1_20_5)) {
+            if (!MCVersion.CURRENT.atLeast(MCVersion.MC1_20_5)) {
                 if (!Objects.equals(instanceOne.getBasePotionData(), instanceTwo.getBasePotionData())) {
                     return true;
                 }
@@ -526,7 +524,7 @@ public final class ItemUtils {
                 return true;
             }
 
-            if (MC_VERSION.atLeast(MCVersion.MC1_20_4)) {
+            if (MCVersion.CURRENT.atLeast(MCVersion.MC1_20_4)) {
                 if (!Objects.equals(instanceOne.getSpawnedEntity(), instanceTwo.getSpawnedEntity())) {
                     return true;
                 }
@@ -539,9 +537,7 @@ public final class ItemUtils {
 
         // Armor
         if (meta1 instanceof ArmorMeta instanceOne && meta2 instanceof ArmorMeta instanceTwo) {
-            if (!Objects.equals(instanceOne.getTrim(), instanceTwo.getTrim())) {
-                return true;
-            }
+            return !Objects.equals(instanceOne.getTrim(), instanceTwo.getTrim());
         }
 
         /*
