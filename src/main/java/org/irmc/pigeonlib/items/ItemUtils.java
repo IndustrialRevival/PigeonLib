@@ -1,20 +1,18 @@
 package org.irmc.pigeonlib.items;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
-import org.irmc.pigeonlib.mcversion.MCVersion;
 import org.jetbrains.annotations.Contract;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 @UtilityClass
 public final class ItemUtils {
@@ -59,10 +57,8 @@ public final class ItemUtils {
      * This method compares two instances of {@link ItemStack} and checks
      * whether their {@link Material} and {@link ItemMeta} match.
      *
-     * @param a
-     *            {@link ItemStack} One
-     * @param b
-     *            {@link ItemStack} Two
+     * @param a {@link ItemStack} One
+     * @param b {@link ItemStack} Two
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(@Nullable ItemStack a, @Nullable ItemStack b) {
@@ -71,8 +67,9 @@ public final class ItemUtils {
 
     /**
      * This method compares two instances of {@link ItemStack} and checks
-     * @param item1 item one
-     * @param item2 item two
+     *
+     * @param item1     item one
+     * @param item2     item two
      * @param checkLore Whether to check lore
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
@@ -82,10 +79,11 @@ public final class ItemUtils {
 
     /**
      * This method compares two instances of {@link ItemStack} and checks
-     * @param item1 item one
-     * @param item2 item two
-     * @param checkLore Whether to check lore
-    * @param checkAmount Whether to check amount
+     *
+     * @param item1       item one
+     * @param item2       item two
+     * @param checkLore   Whether to check lore
+     * @param checkAmount Whether to check amount
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount) {
@@ -98,11 +96,12 @@ public final class ItemUtils {
 
     /**
      * This method compares two instances of {@link ItemStack} and checks
-     * @param item1 item one
-     * @param item2 item two
-     * @param checkLore Whether to check lore
-     * @param checkAmount Whether to check amount
-     * @param checkSameID Whether to check SameIDItem
+     *
+     * @param item1          item one
+     * @param item2          item two
+     * @param checkLore      Whether to check lore
+     * @param checkAmount    Whether to check amount
+     * @param checkSameID    Whether to check SameIDItem
      * @param checkDictonary Whether to check DictionaryItem
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
@@ -166,11 +165,6 @@ public final class ItemUtils {
             return false;
         }
 
-        // Same ID Item need make isSimilarItem by themselves
-        if (checkSameID && item1 instanceof SameIDItem sii && item2 instanceof SameIDItem) {
-            return sii.isSimilarItem(item1, item2);
-        }
-
         // Make sure enchantments match
         if (!itemMeta.getEnchants().equals(cachedMeta.getEnchants())) {
             return false;
@@ -182,14 +176,14 @@ public final class ItemUtils {
         }
 
         // Check the display name
-        if (itemMeta.hasDisplayName() && !Objects.equals(itemMeta.getDisplayName(), cachedMeta.getDisplayName())) {
+        if (itemMeta.hasDisplayName() && !Objects.equals(itemMeta.displayName(), cachedMeta.displayName())) {
             return false;
         }
 
         // Check the lore
         if (checkLore) {
             if (itemMeta.hasLore() && cachedMeta.hasLore()) {
-                if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
+                if (!Objects.equals(itemMeta.lore(), cachedMeta.lore())) {
                     return false;
                 }
             } else if (itemMeta.hasLore() != cachedMeta.hasLore()) {
@@ -201,7 +195,7 @@ public final class ItemUtils {
         final boolean hasAttributeOne = itemMeta.hasAttributeModifiers();
         final boolean hasAttributeTwo = cachedMeta.hasAttributeModifiers();
         if (hasAttributeOne) {
-            if (!hasAttributeTwo ||!Objects.equals(itemMeta.getAttributeModifiers(), cachedMeta.getAttributeModifiers())) {
+            if (!hasAttributeTwo || !Objects.equals(itemMeta.getAttributeModifiers(), cachedMeta.getAttributeModifiers())) {
                 return false;
             }
         } else if (hasAttributeTwo) {
@@ -213,59 +207,56 @@ public final class ItemUtils {
             return false;
         }
 
-        /*
-        if (MC_VERSION.atLeast(MCVersion.MC1_20_5)) {
-            // Check if fire-resistant
-            if (itemMeta.isFireResistant() != cachedMeta.isFireResistant()) {
-                return false;
-            }
 
-            // Check if hide tooltip
-            if (itemMeta.isHideTooltip() != cachedMeta.isHideTooltip()) {
-                return false;
-            }
-
-            // Check rarity
-            final boolean hasRarityOne = itemMeta.hasRarity();
-            final boolean hasRarityTwo = cachedMeta.hasRarity();
-            if (hasRarityOne) {
-                if (!hasRarityTwo || itemMeta.getRarity() != cachedMeta.getRarity()) {
-                    return false;
-                }
-            } else if (hasRarityTwo) {
-                return false;
-            }
-
-            // Check food components
-            if (itemMeta.hasFood() && cachedMeta.hasFood()) {
-                if (!Objects.equals(itemMeta.getFood(), cachedMeta.getFood())) {
-                    return false;
-                }
-            } else if (itemMeta.hasFood() != cachedMeta.hasFood()) {
-                return false;
-            }
-
-            // Check tool components
-            if (itemMeta.hasTool() && cachedMeta.hasTool()) {
-                if (!Objects.equals(itemMeta.getTool(), cachedMeta.getTool())) {
-                    return false;
-                }
-            } else if (itemMeta.hasTool() != cachedMeta.hasTool()) {
-                return false;
-            }
-
-            // Check jukebox playable
-            if (itemMeta.hasJukeboxPlayable() && cachedMeta.hasJukeboxPlayable()) {
-                if (!Objects.equals(itemMeta.getJukeboxPlayable(), cachedMeta.getJukeboxPlayable())) {
-                    return false;
-                }
-            } else if (itemMeta.hasJukeboxPlayable() != cachedMeta.hasJukeboxPlayable()) {
-                return false;
-            }
+        // Check if fire-resistant
+        if (itemMeta.hasDamageResistant() != cachedMeta.hasDamageResistant()) {
+            return false;
         }
-         */
 
-        return true;
+        if (itemMeta.getDamageResistant().getValues() != cachedMeta.getDamageResistant().getValues()) {
+            return false;
+        }
+
+        // Check if hide tooltip
+        if (itemMeta.isHideTooltip() != cachedMeta.isHideTooltip()) {
+            return false;
+        }
+
+        // Check rarity
+        final boolean hasRarityOne = itemMeta.hasRarity();
+        final boolean hasRarityTwo = cachedMeta.hasRarity();
+        if (hasRarityOne) {
+            if (!hasRarityTwo || itemMeta.getRarity() != cachedMeta.getRarity()) {
+                return false;
+            }
+        } else if (hasRarityTwo) {
+            return false;
+        }
+
+        // Check food components
+        if (itemMeta.hasFood() && cachedMeta.hasFood()) {
+            if (!Objects.equals(itemMeta.getFood(), cachedMeta.getFood())) {
+                return false;
+            }
+        } else if (itemMeta.hasFood() != cachedMeta.hasFood()) {
+            return false;
+        }
+
+        // Check tool components
+        if (itemMeta.hasTool() && cachedMeta.hasTool()) {
+            if (!Objects.equals(itemMeta.getTool(), cachedMeta.getTool())) {
+                return false;
+            }
+        } else if (itemMeta.hasTool() != cachedMeta.hasTool()) {
+            return false;
+        }
+
+        // Check jukebox playable
+        if (itemMeta.hasJukeboxPlayable() && cachedMeta.hasJukeboxPlayable()) {
+            return Objects.equals(itemMeta.getJukeboxPlayable(), cachedMeta.getJukeboxPlayable());
+        } else {
+            return itemMeta.hasJukeboxPlayable() == cachedMeta.hasJukeboxPlayable();
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -443,11 +434,10 @@ public final class ItemUtils {
 
         // Potion
         if (meta1 instanceof PotionMeta instanceOne && meta2 instanceof PotionMeta instanceTwo) {
-            if (!MCVersion.CURRENT.atLeast(MCVersion.MC1_20_5)) {
-                if (!Objects.equals(instanceOne.getBasePotionData(), instanceTwo.getBasePotionData())) {
-                    return true;
-                }
+            if (!Objects.equals(instanceOne.getBasePotionData(), instanceTwo.getBasePotionData())) {
+                return true;
             }
+
             if (instanceOne.hasCustomEffects() != instanceTwo.hasCustomEffects()) {
                 return true;
             }
@@ -520,18 +510,12 @@ public final class ItemUtils {
         // Spawn Egg
         if (meta1 instanceof SpawnEggMeta instanceOne && meta2 instanceof SpawnEggMeta instanceTwo) {
             //for removal
-            if (!instanceOne.getSpawnedType().equals(instanceTwo.getSpawnedType())) {
+            if (!Objects.equals(instanceOne.getCustomSpawnedType(), instanceTwo.getCustomSpawnedType())) {
                 return true;
             }
 
-            if (MCVersion.CURRENT.atLeast(MCVersion.MC1_20_4)) {
-                if (!Objects.equals(instanceOne.getSpawnedEntity(), instanceTwo.getSpawnedEntity())) {
-                    return true;
-                }
-            } else {
-                if (!instanceOne.getCustomSpawnedType().equals(instanceTwo.getCustomSpawnedType())) {
-                    return true;
-                }
+            if (!Objects.equals(instanceOne.getSpawnedEntity(), instanceTwo.getSpawnedEntity())) {
+                return true;
             }
         }
 
@@ -540,37 +524,32 @@ public final class ItemUtils {
             return !Objects.equals(instanceOne.getTrim(), instanceTwo.getTrim());
         }
 
-        /*
-        if (MC_VERSION.atLeast(MCVersion.MC1_20_5)) {
-            // Writable Book
-            if (meta1 instanceof WritableBookMeta instanceOne && meta2 instanceof WritableBookMeta instanceTwo) {
-                if (instanceOne.getPageCount() != instanceTwo.getPageCount()) {
-                    return true;
-                }
-                if (!Objects.equals(instanceOne.getPages(), instanceTwo.getPages())) {
-                    return true;
-                }
-            }
-            if (MC_VERSION.atLeast(MCVersion.MC1_21)) {
-                // Ominous Bottle
-                if (meta1 instanceof OminousBottleMeta instanceOne && meta2 instanceof OminousBottleMeta instanceTwo) {
-                    if (instanceOne.hasAmplifier() != instanceTwo.hasAmplifier()) {
-                        return true;
-                    }
 
-                    if (instanceOne.getAmplifier() != instanceTwo.getAmplifier()) {
-                        return true;
-                    }
-                }
-                // Shield
-                if (meta1 instanceof ShieldMeta instanceOne && meta2 instanceof ShieldMeta instanceTwo) {
-                    if (Objects.equals(instanceOne.getBaseColor(), instanceTwo.getBaseColor())) {
-                        return true;
-                    }
-                }
+        // Writable Book
+        if (meta1 instanceof WritableBookMeta instanceOne && meta2 instanceof WritableBookMeta instanceTwo) {
+            if (instanceOne.getPageCount() != instanceTwo.getPageCount()) {
+                return true;
+            }
+            if (!Objects.equals(instanceOne.getPages(), instanceTwo.getPages())) {
+                return true;
             }
         }
-         */
+
+        // Ominous Bottle
+        if (meta1 instanceof OminousBottleMeta instanceOne && meta2 instanceof OminousBottleMeta instanceTwo) {
+            if (instanceOne.hasAmplifier() != instanceTwo.hasAmplifier()) {
+                return true;
+            }
+
+            if (instanceOne.getAmplifier() != instanceTwo.getAmplifier()) {
+                return true;
+            }
+        }
+        // Shield
+        if (meta1 instanceof ShieldMeta instanceOne && meta2 instanceof ShieldMeta instanceTwo) {
+            return Objects.equals(instanceOne.getBaseColor(), instanceTwo.getBaseColor());
+        }
+
 
         // Cannot escape via any meta extension check
         return false;
@@ -580,19 +559,16 @@ public final class ItemUtils {
      * This method damages the specified Item by the given amount.
      * If ignoredEnchantments is set to false, it will factor in the "Unbreaking" Enchantment.
      *
-     * @param item
-     *            The Item to damage
-     * @param damage
-     *            The amount of damage to apply
-     * @param ignoreEnchantments
-     *            Whether the Unbreaking Enchantment should be ignored
+     * @param item               The Item to damage
+     * @param damage             The amount of damage to apply
+     * @param ignoreEnchantments Whether the Unbreaking Enchantment should be ignored
      */
     public static void damageItem(@Nonnull ItemStack item, int damage, boolean ignoreEnchantments) {
         if (item.getType() != Material.AIR && item.getAmount() > 0) {
             int remove = damage;
 
-            if (!ignoreEnchantments && item.getEnchantments().containsKey(Enchantment.DURABILITY)) {
-                int level = item.getEnchantmentLevel(Enchantment.DURABILITY);
+            if (!ignoreEnchantments && item.getEnchantments().containsKey(Enchantment.UNBREAKING)) {
+                int level = item.getEnchantmentLevel(Enchantment.UNBREAKING);
 
                 for (int i = 0; i < damage; i++) {
                     if (Math.random() * 100 <= (60 + Math.floorDiv(40, (level + 1)))) {
@@ -617,10 +593,8 @@ public final class ItemUtils {
      * This Method will consume the Item in the specified slot.
      * See {@link ItemUtils#consumeItem(ItemStack, int, boolean)} for further details.
      *
-     * @param item
-     *            The Item to consume
-     * @param amount
-     *            The number of items to consume
+     * @param item   The Item to consume
+     * @param amount The number of items to consume
      */
     public static void consumeItem(@Nonnull ItemStack item, int amount) {
         consumeItem(item, amount, true);
@@ -639,12 +613,9 @@ public final class ItemUtils {
      * {@code Buckets -> new ItemStack(Material.BUCKET)}
      * {@code Potions -> new ItemStack(Material.GLASS_BOTTLE)}
      *
-     * @param item
-     *            The Item to consume
-     * @param amount
-     *            The number of items to consume
-     * @param replaceConsumables
-     *            Whether Items should be replaced with their "empty" version
+     * @param item               The Item to consume
+     * @param amount             The number of items to consume
+     * @param replaceConsumables Whether Items should be replaced with their "empty" version
      */
     public static void consumeItem(@Nonnull ItemStack item, int amount, boolean replaceConsumables) {
         if (!item.getType().isAir() && item.getAmount() > 0) {
@@ -681,8 +652,9 @@ public final class ItemUtils {
 
     /**
      * This method adds a line of lore to the specified item.
-     * @param item the item
-     * @param lore the line of lore to add
+     *
+     * @param item            the item
+     * @param lore            the line of lore to add
      * @param appendEmptyLine whether to append an empty line before the line of lore (won't append if the item has no lore)
      */
     public static void addLore(ItemStack item, Component lore, boolean appendEmptyLine) {
@@ -721,6 +693,7 @@ public final class ItemUtils {
 
     /**
      * Get the display name of the item.
+     *
      * @param item the item
      * @return return translated display name of the item or head owner's name if the item is a player head
      */

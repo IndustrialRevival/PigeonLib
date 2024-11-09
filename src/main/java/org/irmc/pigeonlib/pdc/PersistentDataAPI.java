@@ -2,10 +2,13 @@ package org.irmc.pigeonlib.pdc;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.irmc.pigeonlib.pdc.types.PersistentDataTypes;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 /**
  * This class provides a simple API for accessing persistent data containers on Bukkit objects.
@@ -13,6 +16,42 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PersistentDataAPI {
     private PersistentDataAPI() {}
+
+    public static OptionalInt getOptionalInt(PersistentDataHolder holder, NamespacedKey key) {
+        return getOptionalInt(holder, key, 0);
+    }
+
+    public static OptionalInt getOptionalInt(PersistentDataHolder holder, NamespacedKey key, @Nullable Integer def) {
+        if (holder.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
+            Integer value = holder.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+            return value == null ? (def == null ? OptionalInt.empty() : OptionalInt.of(def)) : OptionalInt.of(value);
+        }
+        return def == null ? OptionalInt.empty() : OptionalInt.of(def);
+    }
+
+    public static OptionalDouble getOptionalDouble(PersistentDataHolder holder, NamespacedKey key) {
+        return getOptionalDouble(holder, key, 0.0);
+    }
+
+    public static OptionalDouble getOptionalDouble(PersistentDataHolder holder, NamespacedKey key, @Nullable Double def) {
+        if (holder.getPersistentDataContainer().has(key, PersistentDataType.DOUBLE)) {
+            Double value = holder.getPersistentDataContainer().get(key, PersistentDataType.DOUBLE);
+            return value == null ? (def == null ? OptionalDouble.empty() : OptionalDouble.of(def)) : OptionalDouble.of(value);
+        }
+        return def == null ? OptionalDouble.empty() : OptionalDouble.of(def);
+    }
+
+    public static OptionalLong getOptionalLong(PersistentDataHolder holder, NamespacedKey key) {
+        return getOptionalLong(holder, key, 0L);
+    }
+
+    public static OptionalLong getOptionalLong(PersistentDataHolder holder, NamespacedKey key, @Nullable Long def) {
+        if (holder.getPersistentDataContainer().has(key, PersistentDataType.LONG)) {
+            Long value = holder.getPersistentDataContainer().get(key, PersistentDataType.LONG);
+            return value == null ? (def == null ? OptionalLong.empty() : OptionalLong.of(def)) : OptionalLong.of(value);
+        }
+        return def == null ? OptionalLong.empty() : OptionalLong.of(def);
+    }
 
     public static int getInt(PersistentDataHolder holder, NamespacedKey key) {
         return getInt(holder, key, 0);
@@ -123,6 +162,36 @@ public class PersistentDataAPI {
 
     public static void setLocation(PersistentDataHolder holder, NamespacedKey key, Location value) {
         holder.getPersistentDataContainer().set(key, PersistentDataTypes.LOCATION, value);
+    }
+
+    @Nullable public static UUID getUUID(PersistentDataHolder holder, NamespacedKey key) {
+        return getUUID(holder, key, null);
+    }
+
+    @Nullable public static UUID getUUID(PersistentDataHolder holder, NamespacedKey key, @Nullable UUID def) {
+        if (def == null) {
+            return holder.getPersistentDataContainer().get(key, PersistentDataTypes.UUID);
+        }
+        return holder.getPersistentDataContainer().getOrDefault(key, PersistentDataTypes.UUID, def);
+    }
+
+    public static void setUUID(PersistentDataHolder holder, NamespacedKey key, UUID value) {
+        holder.getPersistentDataContainer().set(key, PersistentDataTypes.UUID, value);
+    }
+
+    @Nullable public static ItemStack getItemStack(PersistentDataHolder holder, NamespacedKey key) {
+        return getItemStack(holder, key, null);
+    }
+
+    @Nullable public static ItemStack getItemStack(PersistentDataHolder holder, NamespacedKey key, @Nullable ItemStack def) {
+        if (def == null) {
+            return holder.getPersistentDataContainer().get(key, PersistentDataTypes.ITEM_STACK);
+        }
+        return holder.getPersistentDataContainer().getOrDefault(key, PersistentDataTypes.ITEM_STACK, def);
+    }
+
+    public static void setItemStack(PersistentDataHolder holder, NamespacedKey key, ItemStack value) {
+        holder.getPersistentDataContainer().set(key, PersistentDataTypes.ITEM_STACK, value);
     }
 
     public static <T, Z> void set(PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {

@@ -23,7 +23,7 @@ import org.bukkit.plugin.Plugin;
 final class ChatInputListener implements Listener {
 
     private final Plugin plugin;
-    private Map<UUID, Set<ChatInputHandler>> handlers;
+    private final Map<UUID, Set<ChatInputHandler>> handlers;
 
     ChatInputListener(Plugin plugin) {
         this.plugin = plugin;
@@ -82,8 +82,9 @@ final class ChatInputListener implements Listener {
                 }
             }
 
-            if (callbacks.isEmpty())
+            if (callbacks.isEmpty()) {
                 handlers.remove(p.getUniqueId());
+            }
         }
     }
 }

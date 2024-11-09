@@ -34,7 +34,7 @@ public class HeadItem {
     }
 
     public static ItemStack createByUrl(String url) {
-        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+        ItemStack itemStack = ItemStack.of(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
         OfflinePlayer player = Bukkit.getOfflinePlayer(FAKE_OWNER);
         PlayerProfile profile = (PlayerProfile) player.getPlayerProfile().clone();
