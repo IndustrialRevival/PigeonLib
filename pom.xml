@@ -6,7 +6,7 @@
 
     <groupId>org.irmc</groupId>
     <artifactId>PigeonLib</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.4.1</version>
     <packaging>jar</packaging>
 
     <name>PigeonLib</name>
