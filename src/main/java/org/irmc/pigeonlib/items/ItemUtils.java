@@ -647,17 +647,17 @@ public final class ItemUtils {
         if (!item.getType().isAir() && item.getAmount() > 0) {
             if (replaceConsumables) {
                 switch (item.getType()) {
-                    case POTION, DRAGON_BREATH, HONEY_BOTTLE -> {
-                        item.setType(Material.GLASS_BOTTLE);
-                        item.setAmount(1);
-                        return;
-                    }
-                    case WATER_BUCKET, LAVA_BUCKET, MILK_BUCKET -> {
+                    case WATER_BUCKET, LAVA_BUCKET, MILK_BUCKET, COD_BUCKET, SALMON_BUCKET, PUFFERFISH_BUCKET, TROPICAL_FISH_BUCKET, AXOLOTL_BUCKET, POWDER_SNOW_BUCKET, TADPOLE_BUCKET -> {
                         item.setType(Material.BUCKET);
                         item.setAmount(1);
-                        return;
                     }
-                    default -> {
+                    case POTION, SPLASH_POTION, LINGERING_POTION, HONEY_BOTTLE, DRAGON_BREATH -> {
+                        item.setType(Material.GLASS_BOTTLE);
+                        item.setAmount(1);
+                    }
+                    case MUSHROOM_STEW, BEETROOT_SOUP, RABBIT_STEW, SUSPICIOUS_STEW -> {
+                        item.setType(Material.BOWL);
+                        item.setAmount(1);
                     }
                 }
             }
