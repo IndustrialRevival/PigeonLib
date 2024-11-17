@@ -62,7 +62,7 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(@Nullable ItemStack a, @Nullable ItemStack b) {
-        return isItemSimilar(a, b, false, false, false, true);
+        return isItemSimilar(a, b, false, false, false, true, false);
     }
 
     /**
@@ -74,7 +74,7 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore) {
-        return isItemSimilar(item1, item2, checkLore, false, false, true);
+        return isItemSimilar(item1, item2, checkLore, false, false, true, false);
     }
 
     /**
@@ -87,25 +87,49 @@ public final class ItemUtils {
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount) {
-        return isItemSimilar(item1, item2, checkLore, checkAmount, false, true);
+        return isItemSimilar(item1, item2, checkLore, checkAmount, false, true, false);
     }
 
+    /**
+     * This method compares two instances of {@link ItemStack} and checks
+     * @param item1         item one
+     * @param item2         item two
+     * @param checkLore     Whether to check lore
+     * @param checkAmount   Whether to check amount
+     * @param checkSameID   Whether to check SameIDItem
+     * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
+     */
     public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID) {
-        return isItemSimilar(item1, item2, checkLore, checkAmount, checkSameID, true);
+        return isItemSimilar(item1, item2, checkLore, checkAmount, checkSameID, true, false);
+    }
+
+    /**
+     * This method compares two instances of {@link ItemStack} and checks
+     * @param item1             item one
+     * @param item2             item two
+     * @param checkLore         Whether to check lore
+     * @param checkAmount       Whether to check amount
+     * @param checkSameID       Whether to check SameIDItem
+     * @param checkDictionary   Whether to check DictionaryItem
+     * @return
+     */
+    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID, boolean checkDictionary) {
+        return isItemSimilar(item1, item2, checkLore, checkAmount, checkSameID, checkDictionary, false);
     }
 
     /**
      * This method compares two instances of {@link ItemStack} and checks
      *
-     * @param item1          item one
-     * @param item2          item two
-     * @param checkLore      Whether to check lore
-     * @param checkAmount    Whether to check amount
-     * @param checkSameID    Whether to check SameIDItem
-     * @param checkDictonary Whether to check DictionaryItem
+     * @param item1                 item one
+     * @param item2                 item two
+     * @param checkLore             Whether to check lore
+     * @param checkAmount           Whether to check amount
+     * @param checkSameID           Whether to check SameIDItem
+     * @param checkDictionary       Whether to check DictionaryItem
+     * @param checkCustomModelData  Whether to check CustomModelData
      * @return Whether the two instances of {@link ItemStack} are similar and can be stacked.
      */
-    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID, boolean checkDictonary) {
+    public static boolean isItemSimilar(ItemStack item1, ItemStack item2, boolean checkLore, boolean checkAmount, boolean checkSameID, boolean checkDictionary, boolean checkCustomModelData) {
         // Null check
         if (item1 == null || item2 == null) {
             return item1 == null && item2 == null;
@@ -149,15 +173,17 @@ public final class ItemUtils {
             return false;
         }
 
-        // Custom model data is different, no match
-        final boolean hasCustomOne = itemMeta.hasCustomModelData();
-        final boolean hasCustomTwo = cachedMeta.hasCustomModelData();
-        if (hasCustomOne) {
-            if (!hasCustomTwo || itemMeta.getCustomModelData() != cachedMeta.getCustomModelData()) {
+        if (checkCustomModelData) {
+            // Custom model data is different, no match
+            final boolean hasCustomOne = itemMeta.hasCustomModelData();
+            final boolean hasCustomTwo = cachedMeta.hasCustomModelData();
+            if (hasCustomOne) {
+                if (!hasCustomTwo || itemMeta.getCustomModelData() != cachedMeta.getCustomModelData()) {
+                    return false;
+                }
+            } else if (hasCustomTwo) {
                 return false;
             }
-        } else if (hasCustomTwo) {
-            return false;
         }
 
         // PDCs don't match
