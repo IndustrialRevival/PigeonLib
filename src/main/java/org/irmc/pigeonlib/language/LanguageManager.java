@@ -3,6 +3,7 @@ package org.irmc.pigeonlib.language;
 import java.io.File;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.jar.JarEntry;
@@ -48,7 +49,7 @@ public final class LanguageManager {
         String jarPath = fileURL.toString().substring(0, fileURL.toString().indexOf("!/") + 2);
 
         try {
-            URL jar = new URL(jarPath);
+            URL jar = URI.create(jarPath).toURL();
             JarURLConnection jarCon = (JarURLConnection) jar.openConnection();
             JarFile jarFile = jarCon.getJarFile();
             Enumeration<JarEntry> jarEntries = jarFile.entries();

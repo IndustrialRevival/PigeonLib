@@ -198,6 +198,21 @@ public class PersistentDataAPI {
         holder.getPersistentDataContainer().set(key, PersistentDataTypes.ITEM_STACK, value);
     }
 
+    @Nullable public static NamespacedKey getNamespacedKey(PersistentDataHolder holder, NamespacedKey key) {
+        return getNamespacedKey(holder, key, null);
+    }
+
+    @Nullable public static NamespacedKey getNamespacedKey(PersistentDataHolder holder, NamespacedKey key, @Nullable NamespacedKey def) {
+        if (def == null) {
+            return holder.getPersistentDataContainer().get(key, PersistentDataTypes.NAMESPACED_KEY);
+        }
+        return holder.getPersistentDataContainer().getOrDefault(key, PersistentDataTypes.NAMESPACED_KEY, def);
+    }
+
+    public static void setNamespacedKey(PersistentDataHolder holder, NamespacedKey key, NamespacedKey value) {
+        holder.getPersistentDataContainer().set(key, PersistentDataTypes.NAMESPACED_KEY, value);
+    }
+
     public static <T, Z> void set(PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         holder.getPersistentDataContainer().set(key, type, value);
     }

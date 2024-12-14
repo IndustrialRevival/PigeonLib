@@ -21,7 +21,7 @@ import java.util.List;
 
 @Getter
 @SuppressWarnings("deprecation")
-public class CustomItemStack {
+public class CustomItemStack implements Cloneable {
     private ItemStack bukkit;
 
     public CustomItemStack(Material material) {
@@ -43,6 +43,19 @@ public class CustomItemStack {
                 List<String> loreList = new ArrayList<>(List.of(lore));
                 loreList.replaceAll(s -> ChatColor.translateAlternateColorCodes('&', s));
                 meta.setLore(loreList);
+            }
+        });
+    }
+
+    public CustomItemStack(Material material, Component displayName, Component... lore) {
+        bukkit = ItemStack.of(material);
+        bukkit.editMeta(meta -> {
+            if (displayName != null) {
+                meta.displayName(displayName);
+            }
+
+            if (lore != null && lore.length > 0) {
+                meta.lore(new ArrayList<>(List.of(lore)));
             }
         });
     }
@@ -98,6 +111,20 @@ public class CustomItemStack {
                 List<String> loreList = new ArrayList<>(List.of(lore));
                 loreList.replaceAll(s -> ChatColor.translateAlternateColorCodes('&', s));
                 meta.setLore(loreList);
+            }
+        });
+    }
+
+    public CustomItemStack(ItemStack itemStack, int amount, Component displayName, Component... lore) {
+        bukkit = itemStack.clone();
+        bukkit.setAmount(amount);
+        bukkit.editMeta(meta -> {
+            if (displayName != null) {
+                meta.displayName(displayName);
+            }
+
+            if (lore != null && lore.length > 0) {
+                meta.lore(new ArrayList<>(List.of(lore)));
             }
         });
     }
@@ -198,7 +225,7 @@ public class CustomItemStack {
         return this;
     }
 
-    public CustomItemStack setCustomModelData(int data) {
+    public CustomItemStack setCustomModel(int data) {
         bukkit.editMeta(meta -> meta.setCustomModelData(data));
         return this;
     }
@@ -263,6 +290,11 @@ public class CustomItemStack {
         return this;
     }
 
+    public CustomItemStack setCustomModelDataComponent(CustomModelDataComponent component) {
+        bukkit.editMeta(meta -> meta.setCustomModelDataComponent(component));
+        return this;
+    }
+
     public CustomItemStack setUseRemainder(ItemStack remainder) {
         bukkit.editMeta(meta -> meta.setUseRemainder(remainder));
         return this;
@@ -313,5 +345,10 @@ public class CustomItemStack {
     public CustomItemStack addAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
         bukkit.editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
         return this;
+    }
+
+    @Override
+    public CustomItemStack clone() {
+        return new CustomItemStack(bukkit.clone());
     }
 }
