@@ -1,7 +1,7 @@
 package org.irmc.pigeonlib.enums;
 
-import io.papermc.lib.PaperLib;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 
 /**
  * This class represents a Minecraft version. It contains a major and minor version number, and provides methods to compare
@@ -45,8 +45,9 @@ public enum MCVersion {
     }
 
     public static MCVersion getCurrentVersion() {
-        int major = PaperLib.getMinecraftVersion();
-        int minor = PaperLib.getMinecraftPatchVersion();
+        String[] v = Bukkit.getMinecraftVersion().split("\\.");
+        int major = Integer.parseInt(v[1]);
+        int minor = Integer.parseInt(v[2]);
         return of(major, minor);
     }
 
@@ -76,9 +77,5 @@ public enum MCVersion {
 
     public boolean isUnknown() {
         return this == UNKNOWN;
-    }
-
-    public boolean isNotUnknown() {
-        return this != UNKNOWN;
     }
 }
