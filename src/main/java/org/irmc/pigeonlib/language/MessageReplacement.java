@@ -1,30 +1,14 @@
 package org.irmc.pigeonlib.language;
 
-import it.unimi.dsi.fastutil.Pair;
-import lombok.Getter;
+import org.irmc.pigeonlib.objects.Pair;
 
-@Getter
-public final class MessageReplacement implements Pair<String, String> {
-    private final String placeholder;
-    private final String replacement;
-
+public final class MessageReplacement extends Pair<String, String> {
     private MessageReplacement(String placeholder, String replacement) {
-        this.placeholder = placeholder;
-        this.replacement = replacement;
-    }
-
-    @Override
-    public String left() {
-        return placeholder;
-    }
-
-    @Override
-    public String right() {
-        return replacement;
+        super(placeholder, replacement);
     }
 
     public String parse(String message) {
-        return message.replaceAll(placeholder, replacement);
+        return message.replaceAll(left(), right());
     }
 
     public static MessageReplacement replace(String placeholder, String replacement) {

@@ -1,6 +1,5 @@
 package org.irmc.pigeonlib.enums;
 
-import lombok.Getter;
 import org.bukkit.Bukkit;
 
 /**
@@ -9,7 +8,6 @@ import org.bukkit.Bukkit;
  * @author balugaq
  */
 @SuppressWarnings("unused")
-@Getter
 public enum MCVersion {
     MINECRAFT_1_21(21, 0),
     MINECRAFT_1_21_1(21, 1),
@@ -49,6 +47,14 @@ public enum MCVersion {
         int major = Integer.parseInt(v[1]);
         int minor = Integer.parseInt(v[2]);
         return of(major, minor);
+    }
+
+    public int getMajor() {
+        return major;
+    }
+
+    public int getMinor() {
+        return minor;
     }
 
     public boolean isAtLeast(MCVersion version) {

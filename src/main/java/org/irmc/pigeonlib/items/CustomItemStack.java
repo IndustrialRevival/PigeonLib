@@ -1,7 +1,6 @@
 package org.irmc.pigeonlib.items;
 
 import com.google.common.collect.Multimap;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -19,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
 @SuppressWarnings("deprecation")
 public class CustomItemStack implements Cloneable {
     private ItemStack bukkit;
@@ -345,6 +343,10 @@ public class CustomItemStack implements Cloneable {
     public CustomItemStack addAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
         bukkit.editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
         return this;
+    }
+
+    public ItemStack getBukkit() {
+        return bukkit;
     }
 
     @Override

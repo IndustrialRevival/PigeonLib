@@ -1,6 +1,5 @@
 package org.irmc.pigeonlib.reflect;
 
-import lombok.experimental.UtilityClass;
 import org.irmc.pigeonlib.objects.IPair;
 import org.irmc.pigeonlib.objects.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -9,12 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-
 /**
  * @author Final_ROOT
  */
 @SuppressWarnings({"unchecked", "unused"})
-@UtilityClass
 public class ReflectionUtil {
 
     public static boolean setValue(@NotNull Object object, @NotNull String field, Object value) {

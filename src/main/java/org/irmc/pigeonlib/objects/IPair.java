@@ -1,6 +1,8 @@
 package org.irmc.pigeonlib.objects;
 
-public interface IPair <A, B> {
+import it.unimi.dsi.fastutil.Pair;
+
+public interface IPair <A, B> extends Pair<A, B> {
     A getFirst();
 
     B getSecond();
@@ -10,6 +12,16 @@ public interface IPair <A, B> {
     }
 
     default B getSecondValue() {
+        return getSecond();
+    }
+
+    @Override
+    default A left() {
+        return getFirst();
+    }
+
+    @Override
+    default B right() {
         return getSecond();
     }
 

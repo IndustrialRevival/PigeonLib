@@ -1,6 +1,5 @@
 package org.irmc.pigeonlib.items;
 
-import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-@UtilityClass
 public final class ItemUtils {
     @Contract("null,_ -> null")
     public static ItemStack getCleanedItem(@Nullable ItemStack item, @Nullable Consumer<ItemMeta> additionalSettings) {
