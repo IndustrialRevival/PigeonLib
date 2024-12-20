@@ -3,7 +3,6 @@ package org.irmc.pigeonlib.items;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -14,8 +13,8 @@ import org.bukkit.profile.PlayerTextures;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Base64;
+import java.util.logging.Logger;
 
-@Slf4j
 public class HeadItem {
     private static final String FAKE_OWNER = "IR-Pigeon";
 
@@ -43,7 +42,7 @@ public class HeadItem {
         try {
             textures.setSkin(URI.create(url).toURL());
         } catch (MalformedURLException e) {
-            log.warn("Invalid URL for head item: {}", url);
+            Logger.getAnonymousLogger("PigeonLib").warning("Invalid URL for skull item: " + url);
         }
 
         skullMeta.setPlayerProfile(profile);
