@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
+import org.irmc.pigeonlib.world.WorldUtils;
 import org.jetbrains.annotations.NotNull;
 
 class LocationDataType implements PersistentDataType<String, Location> {
@@ -20,8 +21,7 @@ class LocationDataType implements PersistentDataType<String, Location> {
     @Override
     public @NotNull String toPrimitive(
             @NotNull Location location, @NotNull PersistentDataAdapterContext persistentDataAdapterContext) {
-        return location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ()
-                + "," + location.getYaw() + "," + location.getPitch();
+        return WorldUtils.locationToStringExactly(location);
     }
 
     @Override

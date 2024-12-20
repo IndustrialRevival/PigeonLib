@@ -1,8 +1,5 @@
 package org.irmc.pigeonlib.objects;
 
-import lombok.Getter;
-
-@Getter
 public class ImmutablePair<A, B> implements IPair<A, B> {
     private final A first;
     private final B second;

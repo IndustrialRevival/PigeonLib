@@ -1,12 +1,13 @@
 package org.irmc.pigeonlib.world;
 
-import com.balugaq.buildingstaff.implementation.BuildingStaff;
+
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.irmc.pigeonlib.reflect.ReflectionUtil;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -22,7 +23,7 @@ public class WorldUtils {
 
     static {
         try {
-            World sampleWorld = Bukkit.getWorlds().get(0);
+            World sampleWorld = Bukkit.getWorlds().getFirst();
             BlockState blockstate = sampleWorld.getBlockAt(0, 0, 0).getState();
             var result = ReflectionUtil.getDeclaredFieldsRecursively(blockstate.getClass(), "data");
             interfaceBlockDataField = result.getFirstValue();
@@ -63,33 +64,21 @@ public class WorldUtils {
     }
 
     public static String locationToString(@Nonnull Location l) {
-        if (l == null) {
-            return "Unknown Location";
-        }
         if (l.getWorld() == null) {
             return "Unknown Location";
         }
         return l.getWorld().getName() + "," + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ();
     }
 
-    public static long locationRange(@Nonnull Location pos1, @Nonnull Location pos2) {
-        if (pos1 == null || pos2 == null) {
-            return 0;
+    public static String locationToStringExactly(@Nonnull Location l) {
+        if (l.getWorld() == null) {
+            return "Unknown Location";
         }
 
-        final int downX = Math.min(pos1.getBlockX(), pos2.getBlockX());
-        final int upX = Math.max(pos1.getBlockX(), pos2.getBlockX());
-        final int downY = Math.min(pos1.getBlockY(), pos2.getBlockY());
-        final int upY = Math.max(pos1.getBlockY(), pos2.getBlockY());
-        final int downZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-        final int upZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-        return (long) (Math.abs(upX - downX) + 1) * (Math.abs(upY - downY) + 1) * (Math.abs(upZ - downZ) + 1);
+        return l.getWorld().getName() + "," + l.getX() + "," + l.getY() + "," + l.getZ() + "," + l.getYaw() + "," + l.getPitch();
     }
 
     public static void doWorldEdit(@Nonnull Location pos1, @Nonnull Location pos2, @Nonnull Consumer<Location> consumer) {
-        if (pos1 == null || pos2 == null) {
-            return;
-        }
         final int downX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         final int upX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         final int downY = Math.min(pos1.getBlockY(), pos2.getBlockY());
@@ -107,9 +96,6 @@ public class WorldUtils {
     }
 
     public static long getRange(@Nonnull Location pos1, @Nonnull Location pos2) {
-        if (pos1 == null || pos2 == null) {
-            return 0;
-        }
         final int downX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         final int upX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         final int downY = Math.min(pos1.getBlockY(), pos2.getBlockY());
