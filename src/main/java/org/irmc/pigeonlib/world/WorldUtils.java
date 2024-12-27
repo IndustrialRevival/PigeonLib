@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.irmc.pigeonlib.reflect.ReflectionUtil;
+import org.irmc.pigeonlib.java.ReflectionUtil;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;

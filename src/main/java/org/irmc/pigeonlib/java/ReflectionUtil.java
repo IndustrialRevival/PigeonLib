@@ -1,4 +1,4 @@
-package org.irmc.pigeonlib.reflect;
+package org.irmc.pigeonlib.java;
 
 import org.irmc.pigeonlib.objects.IPair;
 import org.irmc.pigeonlib.objects.Pair;
