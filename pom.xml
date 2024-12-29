@@ -6,7 +6,7 @@
 
     <groupId>org.irmc</groupId>
     <artifactId>PigeonLib</artifactId>
-    <version>0.0.4.3</version>
+    <version>0.0.5</version>
     <packaging>jar</packaging>
 
     <name>PigeonLib</name>
@@ -14,6 +14,7 @@
     <properties>
         <java.version>23</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mcVer>1.21.4</mcVer>
     </properties>
 
     <build>
@@ -39,6 +40,10 @@
 
     <repositories>
         <repository>
+            <id>codemc-nms</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
+        </repository>
+        <repository>
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
@@ -52,7 +57,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>${mcVer}-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,6 +1,6 @@
-package org.irmc.pigeonlib.objects;
+package org.irmc.pigeonlib.objects.percentage;
 
-public final class HundredPercentage extends Percentage{
+public class HundredPercentage extends Percentage {
     private final boolean flowValidated;
 
     HundredPercentage(double value, boolean flowValidated) {
@@ -10,7 +10,7 @@ public final class HundredPercentage extends Percentage{
     }
 
     public static HundredPercentage fromIntPercentage(int value) {
-        return fromIntPercentage(value, false);
+        return fromIntPercentage(value, true);
     }
 
     public static HundredPercentage fromIntPercentage(int value, boolean flowValidated) {
@@ -26,7 +26,7 @@ public final class HundredPercentage extends Percentage{
     }
 
     public static HundredPercentage fromFloatPercentage(float value) {
-        return fromFloatPercentage(value, false);
+        return fromFloatPercentage(value, true);
     }
 
     public static HundredPercentage fromFloatPercentage(float value, boolean flowValidated) {
@@ -42,7 +42,7 @@ public final class HundredPercentage extends Percentage{
     }
 
     public static HundredPercentage fromDoublePercentage(double value) {
-        return fromDoublePercentage(value, false);
+        return fromDoublePercentage(value, true);
     }
 
     public static HundredPercentage fromDoublePercentage(double value, boolean flowValidated) {
@@ -69,5 +69,13 @@ public final class HundredPercentage extends Percentage{
         if (this.getValue() < -1.00 || this.getValue() > 1.00) {
             throw new IllegalArgumentException("Invalid percentage value: " + this.getValue());
         }
+    }
+
+    public PositiveHundredPercentage toPositive() {
+        if (this.getValue() < 0) {
+            throw new IllegalArgumentException("Cannot convert negative percentage to positive");
+        }
+
+        return new PositiveHundredPercentage(this.getValue(), this.flowValidated);
     }
 }

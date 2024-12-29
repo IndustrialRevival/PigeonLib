@@ -1,6 +1,6 @@
-package org.irmc.pigeonlib.objects;
+package org.irmc.pigeonlib.objects.percentage;
 
-public class Percentage {
+public abstract class Percentage {
     private double value;
 
     Percentage(double value) {
@@ -8,11 +8,11 @@ public class Percentage {
     }
 
     public static Percentage fromPercent(double percentValue) {
-        return new Percentage(percentValue);
+        return new FreedomPercentage(percentValue);
     }
 
     public static Percentage fromDecimal(double decimalValue) {
-        return new Percentage(decimalValue / 100);
+        return new FreedomPercentage(decimalValue / 100);
     }
 
     public static Percentage fromString(String stringValue) {
@@ -21,6 +21,14 @@ public class Percentage {
         } else {
             return fromDecimal(Double.parseDouble(stringValue));
         }
+    }
+
+    public static HundredPercentage fromHundredDecimal(double decimalValue) {
+        return new HundredPercentage(decimalValue / 100, true);
+    }
+
+    public static HundredPercentage fromHundredPercent(double percentValue) {
+        return new HundredPercentage(percentValue, true);
     }
 
     public void subtract(Percentage percentage) {
@@ -53,5 +61,9 @@ public class Percentage {
 
     public String toString() {
         return getDecimalValue() + "%";
+    }
+
+    public ImmutablePercentage asImmutable() {
+        return new ImmutablePercentage(value);
     }
 }
