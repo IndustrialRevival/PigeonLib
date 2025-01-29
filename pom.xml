@@ -12,7 +12,7 @@
     <name>PigeonLib</name>
 
     <properties>
-        <java.version>23</java.version>
+        <java.version>22</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mcVer>1.21.4</mcVer>
     </properties>
