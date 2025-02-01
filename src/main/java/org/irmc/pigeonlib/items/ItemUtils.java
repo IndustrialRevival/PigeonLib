@@ -2,6 +2,8 @@ package org.irmc.pigeonlib.items;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
@@ -237,8 +239,16 @@ public final class ItemUtils {
             return false;
         }
 
-        if (itemMeta.getDamageResistant().getValues() != cachedMeta.getDamageResistant().getValues()) {
-            return false;
+        Tag<DamageType> damageTypeTag1 = itemMeta.getDamageResistant();
+        if (damageTypeTag1 != null) {
+            Tag<DamageType> damageTypeTag2 = cachedMeta.getDamageResistant();
+            if (damageTypeTag2 != null) {
+                if (!damageTypeTag1.getValues().equals(damageTypeTag2.getValues())) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         // Check if hide tooltip
@@ -284,7 +294,7 @@ public final class ItemUtils {
     }
 
     @SuppressWarnings("deprecation")
-    private static boolean metaNotEquals(ItemMeta meta1, ItemMeta meta2) {
+    public static boolean metaNotEquals(ItemMeta meta1, ItemMeta meta2) {
         if (meta1 == null || meta2 == null) {
             return meta1 != meta2;
         }
