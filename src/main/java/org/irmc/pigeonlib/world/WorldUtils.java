@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
+@Deprecated
 public class WorldUtils {
     protected static Class<?> craftBlockStateClass;
     protected static Field interfaceBlockDataField;
