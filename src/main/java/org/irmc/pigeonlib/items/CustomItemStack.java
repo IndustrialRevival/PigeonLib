@@ -11,12 +11,15 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class CustomItemStack implements Cloneable {
@@ -58,6 +61,19 @@ public class CustomItemStack implements Cloneable {
         });
     }
 
+    public CustomItemStack(Material material, Component displayName, List<Component> lore) {
+        bukkit = ItemStack.of(material);
+        bukkit.editMeta(meta -> {
+            if (displayName != null) {
+                meta.displayName(displayName);
+            }
+
+            if (lore != null && !lore.isEmpty()) {
+                meta.lore(lore);
+            }
+        });
+    }
+
     public CustomItemStack(Material material, int amount, String displayName, String... lore) {
         bukkit = ItemStack.of(material, amount);
         bukkit.editMeta(meta -> {
@@ -69,6 +85,19 @@ public class CustomItemStack implements Cloneable {
                 List<String> loreList = new ArrayList<>(List.of(lore));
                 loreList.replaceAll(s -> ChatColor.translateAlternateColorCodes('&', s));
                 meta.setLore(loreList);
+            }
+        });
+    }
+
+    public CustomItemStack(Material material, int amount, Component displayName, Component... lore) {
+        bukkit = ItemStack.of(material, amount);
+        bukkit.editMeta(meta -> {
+            if (displayName != null) {
+                meta.displayName(displayName);
+            }
+
+            if (lore != null && lore.length > 0) {
+                meta.lore(new ArrayList<>(List.of(lore)));
             }
         });
     }
@@ -342,6 +371,26 @@ public class CustomItemStack implements Cloneable {
 
     public CustomItemStack addAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
         bukkit.editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
+        return this;
+    }
+
+    public CustomItemStack removeAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+        bukkit.editMeta(meta -> meta.removeAttributeModifier(attribute, modifier));
+        return this;
+    }
+
+    public <T,Z> CustomItemStack setPDCData(NamespacedKey key, PersistentDataType<T,Z> type, Z value) {
+        bukkit.editMeta(meta -> meta.getPersistentDataContainer().set(key, type, value));
+        return this;
+    }
+
+    public CustomItemStack removePDCData(NamespacedKey key) {
+        bukkit.editMeta(meta -> meta.getPersistentDataContainer().remove(key));
+        return this;
+    }
+
+    public CustomItemStack editMeta(Consumer<ItemMeta> consumer) {
+        bukkit.editMeta(consumer);
         return this;
     }
 
