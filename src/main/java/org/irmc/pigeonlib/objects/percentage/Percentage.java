@@ -62,8 +62,4 @@ public abstract class Percentage {
     public String toString() {
         return getDecimalValue() + "%";
     }
-
-    public ImmutablePercentage asImmutable() {
-        return new ImmutablePercentage(value);
-    }
 }

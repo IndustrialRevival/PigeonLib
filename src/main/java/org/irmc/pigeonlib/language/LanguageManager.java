@@ -11,12 +11,14 @@ import java.util.jar.JarFile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.irmc.pigeonlib.enums.Language;
 import org.irmc.pigeonlib.file.ConfigFileUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,13 +28,20 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class LanguageManager {
     private final Plugin plugin;
+    private final Language defaultLanguage;
 
     private final Map<String, YamlConfiguration> configurations = new HashMap<>();
+
     private boolean detectPlayerLocale;
     private YamlConfiguration defaultConfiguration;
 
     public LanguageManager(Plugin plugin) {
+        this(plugin, Language.EN_US);
+    }
+
+    public LanguageManager(Plugin plugin, Language defaultLanguage) {
         this.plugin = plugin;
+        this.defaultLanguage = defaultLanguage;
 
         loadLanguages();
     }
@@ -89,10 +98,12 @@ public final class LanguageManager {
         if (split.length == 1) {
             String[] split2 = lang.split("_");
             if (split2.length == 1) return lang;
-            return lang.replace(split2[1], split2[1].toUpperCase()).replace("_", "-");
+            return lang.replace(split2[1], split2[1].toUpperCase());
         }
         return lang.replace(split[1], split[1].toUpperCase());
     }
+
+    //fixed format methods
 
     public Component getItemName(String id) {
         return parseToComponent(getMsg(null, "item." + id + ".name"));
@@ -118,25 +129,56 @@ public final class LanguageManager {
         return parseToComponentList(getMsgList(null, "group." + id + ".lore"));
     }
 
+    public Component getItemNameByLanguage(Language lang, String id) {
+        return parseToComponent(getMsgByLanguage(lang, "item." + id + ".name"));
+    }
+
+    public List<Component> getItemLoreByLanguage(Language lang, String id) {
+        return parseToComponentList(getMsgListByLanguage(lang, "item." + id + ".lore"));
+    }
+
+    public Component getRecipeTypeNameByLanguage(Language lang, NamespacedKey key) {
+        return parseToComponent(getMsgByLanguage(lang, "recipe_type." + key.getKey() + ".name"));
+    }
+
+    public List<Component> getRecipeTypeLoreByLanguage(Language lang, NamespacedKey key) {
+        return parseToComponentList(getMsgListByLanguage(lang, "recipe_type." + key.getKey() + ".lore"));
+    }
+
+    public Component getGroupNameByLanguage(Language lang, String id) {
+        return parseToComponent(getMsgByLanguage(lang, "group." + id + ".name"));
+    }
+
+    public List<Component> getGroupLoreByLanguage(Language lang, String id) {
+        return parseToComponentList(getMsgListByLanguage(lang, "group." + id + ".lore"));
+    }
+
+    //end of fixed format methods
+
     public void sendMessage(CommandSender CommandSender, String key, MessageReplacement... args) {
         CommandSender.sendMessage(parseToComponent(getMsg(CommandSender, key, args)));
     }
 
-    public static Component parseToComponent(String msg) {
-        return MiniMessage.miniMessage().deserialize(msg).decoration(TextDecoration.ITALIC, false);
-    }
-
-    public static List<Component> parseToComponentList(List<String> msgList) {
-        return msgList.stream().map(LanguageManager::parseToComponent).toList();
+    public void consoleMessage(String key, MessageReplacement... args) {
+        Bukkit.getConsoleSender().sendMessage(parseToComponent(getMsg(null, key, args)));
     }
 
     public Component getMsgComponent(@Nullable CommandSender commandSender, String key, MessageReplacement... args) {
         return parseToComponent(getMsg(commandSender, key, args));
     }
 
+    public Component getMsgComponentByLanguage(@Nullable Language lang, String key, MessageReplacement... args) {
+        return parseToComponent(getMsgByLanguage(lang, key, args));
+    }
+
     public List<Component> getMsgComponentList(
             @Nullable CommandSender CommandSender, String key, MessageReplacement... args) {
         return parseToComponentList(getMsgList(CommandSender, key, args));
+    }
+
+    public List<Component> getMsgComponentListByLanguage(
+            @Nullable Language lang, String key, MessageReplacement... args) {
+        return parseToComponentList(getMsgListByLanguage(lang, key, args));
     }
 
     public String getMsg(@Nullable CommandSender commandSender, String key, MessageReplacement... args) {
@@ -161,16 +203,50 @@ public final class LanguageManager {
         return msgList;
     }
 
+    public String getMsgByLanguage(@Nullable Language lang, String key, MessageReplacement... args) {
+        String msg = getConfiguration(lang).getString(key);
+        if (msg == null) {
+            return key;
+        }
+
+        for (MessageReplacement arg : args) {
+            msg = arg.parse(msg);
+        }
+
+        return msg;
+    }
+
+    public List<String> getMsgListByLanguage(@Nullable Language lang, String key, MessageReplacement... args) {
+        List<String> msgList = getConfiguration(lang).getStringList(key);
+        for (MessageReplacement arg : args) {
+            msgList.replaceAll(arg::parse);
+        }
+
+        return msgList;
+    }
+
     public void reload() {
         loadLanguages();
     }
 
+    public static Component parseToComponent(String msg) {
+        return MiniMessage.miniMessage().deserialize(msg).decoration(TextDecoration.ITALIC, false);
+    }
+
+    public static List<Component> parseToComponentList(List<String> msgList) {
+        return msgList.stream().map(LanguageManager::parseToComponent).toList();
+    }
+
     private Configuration getConfiguration(CommandSender p) {
         if (!detectPlayerLocale || !(p instanceof Player pl)) {
-            String lang = plugin.getConfig().getString("language", "zh-CN");
+            String lang = plugin.getConfig().getString("language", defaultLanguage.toTagRegionUpper());
             return configurations.getOrDefault(lang, defaultConfiguration);
         }
 
         return configurations.getOrDefault(pl.locale().toLanguageTag(), defaultConfiguration);
+    }
+
+    private Configuration getConfiguration(Language lang) {
+        return configurations.getOrDefault(Objects.requireNonNullElse(lang, defaultLanguage).toTagRegionUpper(), defaultConfiguration);
     }
 }

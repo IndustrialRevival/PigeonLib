@@ -28,4 +28,8 @@ public class Pair<A, B> implements IPair<A, B> {
     public void setSecond(B second) {
         this.second = second;
     }
+
+    public ImmutablePair<A, B> toImmutable() {
+        return new ImmutablePair<>(first, second);
+    }
 }
