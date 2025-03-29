@@ -5,7 +5,3 @@ before_install:
 
 jdk:
   - openjdk23
-
-install:
-  - chmod 777 ./mvnw
-  - ./mvnw -s .mvn/settings.xml install -DskipTests
