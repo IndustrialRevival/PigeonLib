@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
  */
 @SuppressWarnings({"unchecked", "unused"})
 public class ReflectionUtil {
-
     public static boolean setValue(@NotNull Object object, @NotNull String field, Object value) {
         try {
             Field declaredField = object.getClass().getDeclaredField(field);

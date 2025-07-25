@@ -9,13 +9,14 @@ import org.bukkit.Bukkit;
  */
 @SuppressWarnings("unused")
 public enum MCVersion {
-    MINECRAFT_1_21(21, 0),
     MINECRAFT_1_21_1(21, 1),
     MINECRAFT_1_21_2(21, 2),
     MINECRAFT_1_21_3(21, 3),
     MINECRAFT_1_21_4(21, 4),
     MINECRAFT_1_21_5(21, 5),
     MINECRAFT_1_21_6(21, 6),
+    MINECRAFT_1_21_7(21, 7),
+    MINECRAFT_1_21_8(21, 8),
     MINECRAFT_1_22(22, 0),
     MINECRAFT_1_22_1(22, 1),
     MINECRAFT_1_22_2(22, 2),

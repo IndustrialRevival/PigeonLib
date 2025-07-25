@@ -1,8 +1,10 @@
 package org.irmc.pigeonlib.java;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -173,5 +175,16 @@ public class CollectionUtil {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static <T> T getIf(@NotNull Collection<T> collection, @NotNull Predicate<T> predicate, @Nullable T defaultValue) {
+        for (T t : collection) {
+            if (predicate.test(t)) {
+                return t;
+            }
+        }
+
+        return defaultValue;
     }
 }

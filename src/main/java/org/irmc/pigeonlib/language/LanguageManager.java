@@ -105,27 +105,27 @@ public final class LanguageManager {
 
     //fixed format methods
 
-    public Component getItemName(String id) {
-        return parseToComponent(getMsg(null, "item." + id + ".name"));
+    public Component getItemName(NamespacedKey id) {
+        return parseToComponent(getMsg(null, "item." + id.toString() + ".name"));
     }
 
-    public List<Component> getItemLore(String id) {
-        return parseToComponentList(getMsgList(null, "item." + id + ".lore"));
+    public List<Component> getItemLore(NamespacedKey id) {
+        return parseToComponentList(getMsgList(null, "item." + id.toString() + ".lore"));
     }
 
     public Component getRecipeTypeName(NamespacedKey key) {
-        return parseToComponent(getMsg(null, "recipe_type." + key.getKey() + ".name"));
+        return parseToComponent(getMsg(null, "recipe_type." + key + ".name"));
     }
 
     public List<Component> getRecipeTypeLore(NamespacedKey key) {
-        return parseToComponentList(getMsgList(null, "recipe_type." + key.getKey() + ".lore"));
+        return parseToComponentList(getMsgList(null, "recipe_type." + key + ".lore"));
     }
 
-    public Component getGroupName(String id) {
+    public Component getGroupName(Component id) {
         return parseToComponent(getMsg(null, "group." + id + ".name"));
     }
 
-    public List<Component> getGroupLore(String id) {
+    public List<Component> getGroupLore(Component id) {
         return parseToComponentList(getMsgList(null, "group." + id + ".lore"));
     }
 
@@ -138,18 +138,18 @@ public final class LanguageManager {
     }
 
     public Component getRecipeTypeNameByLanguage(Language lang, NamespacedKey key) {
-        return parseToComponent(getMsgByLanguage(lang, "recipe_type." + key.getKey() + ".name"));
+        return parseToComponent(getMsgByLanguage(lang, "recipe_type." + key + ".name"));
     }
 
     public List<Component> getRecipeTypeLoreByLanguage(Language lang, NamespacedKey key) {
-        return parseToComponentList(getMsgListByLanguage(lang, "recipe_type." + key.getKey() + ".lore"));
+        return parseToComponentList(getMsgListByLanguage(lang, "recipe_type." + key + ".lore"));
     }
 
-    public Component getGroupNameByLanguage(Language lang, String id) {
+    public Component getGroupNameByLanguage(Language lang, NamespacedKey id) {
         return parseToComponent(getMsgByLanguage(lang, "group." + id + ".name"));
     }
 
-    public List<Component> getGroupLoreByLanguage(Language lang, String id) {
+    public List<Component> getGroupLoreByLanguage(Language lang, NamespacedKey id) {
         return parseToComponentList(getMsgListByLanguage(lang, "group." + id + ".lore"));
     }
 

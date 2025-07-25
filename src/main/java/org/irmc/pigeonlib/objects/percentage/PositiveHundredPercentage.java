@@ -1,6 +1,6 @@
 package org.irmc.pigeonlib.objects.percentage;
 
-public final class PositiveHundredPercentage extends HundredPercentage{
+public final class PositiveHundredPercentage extends HundredPercentage {
     PositiveHundredPercentage(double value, boolean flowValidated) {
         super(value, flowValidated);
     }
