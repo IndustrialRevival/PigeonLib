@@ -125,7 +125,15 @@ public final class LanguageManager {
         return parseToComponent(getMsg(null, "group." + id + ".name"));
     }
 
+    public Component getGroupName(String id) {
+        return parseToComponent(getMsg(null, "group." + id + ".name"));
+    }
+
     public List<Component> getGroupLore(Component id) {
+        return parseToComponentList(getMsgList(null, "group." + id + ".lore"));
+    }
+
+    public List<Component> getGroupLore(String id) {
         return parseToComponentList(getMsgList(null, "group." + id + ".lore"));
     }
 
